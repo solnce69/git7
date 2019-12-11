@@ -1,0 +1,487 @@
+#include "pch.h"
+#include <iostream>
+#include <string>
+using namespace std;
+enum Type {
+
+	T1 = 1,
+	T2 = 2,
+	T3 = 3
+};
+struct Request {
+	unsigned time;
+	Type type;
+	string name;
+};
+
+template <typename T>
+class Stack
+{
+private:
+	T* _stack;
+	unsigned _size;
+public:
+	Stack()
+	{
+		_size = 0;
+		_stack = nullptr;
+	}
+	bool IsEmpty()
+	{
+		return _size == 0;
+	}
+	T Head()
+	{
+		return _stack[_size - 1];
+	}
+	void push(T st)
+	{
+		T* tmp = new T[_size + 1];
+		for (int i = 0; i < _size; i++) {
+			tmp[i] = _stack[i];
+		}
+		tmp[_size] = st;
+		delete[] _stack;
+		_stack = tmp;
+		tmp = nullptr;
+		_size++;
+	}
+	T pop()
+	{
+		if (_size == 0) {
+			T *p;
+			p = nullptr;
+			return (*p);
+		}
+		T st;
+		st = _stack[_size - 1];
+		T* tmp = new T[_size - 1];
+		for (int i = 0; i < _size - 1; i++) {
+			tmp[i] = _stack[i];
+		}
+		delete[] _stack;
+		_stack = tmp;
+		tmp = nullptr;
+		_size--;
+		return st;
+	}
+	~Stack()
+	{
+		if (_size > 0)
+			delete[] _stack;
+	}
+};
+template<typename T>
+class List
+{
+public:
+	List();
+	~List();
+
+	//удаление первого элемента в списке
+	void pop_front();
+
+	//добавление элемента в конец списка
+	void push_back(T data);
+
+	// очистить список
+	void clear();
+
+	// получить количество елементов в списке
+	int GetSize() { return Size; }
+
+	// перегруженный оператор [] 
+	T& operator[](const int index);
+
+	//добавление элемента в начало списка
+	void push_front(T data);
+
+	//добавление элемента в список по указанному индексу
+	void insert(T data, int index);
+
+	//удаление элемента в списке по указанному индексу
+	void removeAt(int index);
+
+	//удаление последнего элемента в списке
+	void pop_back();
+
+private:
+	template<typename T>
+	class Node
+	{
+	public:
+		Node * pNext;
+		T data;
+		Node(T data = T(), Node *pNext = nullptr)
+		{
+			this->data = data;
+			this->pNext = pNext;
+		}
+	};
+	int Size;
+	Node<T> *head;
+};
+
+template<typename T>
+List<T>::List()
+{
+	Size = 0;
+	head = nullptr;
+}
+
+template<typename T>
+List<T>::~List()
+{
+	clear();
+}
+
+template<typename T>
+void List<T>::pop_front()
+{
+	Node<T> *temp = head;
+	head = head->pNext;
+	delete temp;
+	Size--;
+
+}
+
+template<typename T>
+void List<T>::push_back(T data)
+{
+	if (head == nullptr)
+	{
+		head = new Node<T>(data);
+	}
+	else
+	{
+		Node<T> *current = this->head;
+		while (current->pNext != nullptr)
+		{
+			current = current->pNext;
+		}
+		current->pNext = new Node<T>(data);
+
+	}
+
+	Size++;
+}
+
+template<typename T>
+void List<T>::clear()
+{
+	while (Size)
+	{
+		pop_front();
+	}
+}
+
+template<typename T>
+T & List<T>::operator[](const int index)
+{
+	int counter = 0;
+	Node<T> *current = this->head;
+	while (current != nullptr)
+	{
+		if (counter == index)
+		{
+			return current->data;
+		}
+		current = current->pNext;
+		counter++;
+	}
+}
+
+template<typename T>
+void List<T>::push_front(T data)
+{
+	head = new Node<T>(data, head);
+	Size++;
+}
+
+template<typename T>
+void List<T>::insert(T data, int index)
+{
+
+	if (index == 0)
+	{
+		push_front(data);
+	}
+	else
+	{
+		Node<T> *previous = this->head;
+		for (int i = 0; i < index - 1; i++)
+		{
+			previous = previous->pNext;
+		}
+
+		Node<T> *newNode = new Node<T>(data, previous->pNext);
+		previous->pNext = newNode;
+		Size++;
+	}
+}
+
+template<typename T>
+void List<T>::removeAt(int index)
+{
+	if (index == 0)
+	{
+		pop_front();
+	}
+	else
+	{
+		Node<T> *previous = this->head;
+		for (int i = 0; i < index - 1; i++)
+		{
+			previous = previous->pNext;
+		}
+		Node<T> *toDelete = previous->pNext;
+		previous->pNext = toDelete->pNext;
+		delete toDelete;
+		Size--;
+	}
+}
+
+template<typename T>
+void List<T>::pop_back()
+{
+	removeAt(Size - 1);
+}
+
+template<class T>
+class Queue {
+public:
+	Queue() {
+		List<T> _queue;
+	}
+	void push(T value) {
+		_queue.push_back(value);
+	}
+	void pop() {
+		_queue.pop_front();
+	}
+	T top() {
+		return _queue[0];
+	}
+	bool is_empty() {
+		return !(_queue.GetSize());
+	}
+	~Queue() {
+		_queue.clear();
+	}
+private:
+	List<T> _queue;
+};
+int main()
+{
+	setlocale(0, "");
+	unsigned tp, c1, c2, c3, time1, time2, time3, TIME;
+	TIME = time1 = time2 = time3 = c1 = c2 = c3 = 0;
+	string name1, name2, name3;
+	bool P1, P2, P3, _no_stop, _req;
+	_no_stop = true;
+	P1 = P2 = P3 = false;
+	Queue <Request> F;
+	Stack <Request> S;
+	Request R;
+	while (_no_stop) {
+		cout << "Времени прошло: " << TIME << endl;
+		if (P1) {
+			if (c1 < time1) {
+				cout << "Процессор Р1 занят. Задача " << name1 << " выполняется уже " << c1 << " времени из " << time1 << endl;
+			}
+			else {
+				cout << "Процессор Р1 освобождается. Задача " << name1 << " выполняется уже " << c1 << " времени из " << time1 << endl;
+				P1 = false;
+				cout << "Процессор Р1 свободен" << endl;
+			}
+		}
+		else {
+			cout << "Процессор Р1 свободен" << endl;
+		}
+		if (P2) {
+			if (c2 < time2) {
+				cout << "Процессор Р2 занят. Задача " << name2 << " выполняется уже " << c2 << " времени из " << time2 << endl;
+			}
+			else {
+				cout << "Процессор Р2 освобождается. Задача " << name2 << " выполняется уже " << c2 << " времени из " << time2 << endl;
+				P2 = false;
+				cout << "Процессор Р2 свободен" << endl;
+			}
+		}
+		else {
+			cout << "Процессор Р2 свободен" << endl;
+		}
+		if (P3) {
+			if (c3 < time3) {
+				cout << "Процессор Р3 занят. Задача " << name3 << " выполняется уже " << c3 << " времени из " << time3 << endl;
+			}
+			else {
+				cout << "Процессор Р3 освобождается. Задача " << name3 << " выполняется уже " << c3 << " времени из " << time3 << endl;
+				P3 = false;
+				cout << "Процессор Р3 свободен" << endl;
+			}
+		}
+		else {
+			cout << "Процессор Р3 свободен" << endl;
+		}
+		cout << "Вы хотите ввести запрос? Если да, нажмите 1, если нет, нажмите 0: ";
+		cin >> _req;
+		if (_req) {
+			cout << "Ваш запрос:" << endl << "имя: ";
+			cin >> R.name;
+			cout << "тип (1, 2, 3): ";
+			cin >> tp;
+			R.type = static_cast<Type>(tp);
+			cout << "время обработки(в итерациях): ";
+			cin >> R.time;
+			F.push(R);
+		}
+		if (!F.is_empty()) {
+
+			switch (F.top().type) {
+			case T1: {
+
+				if (P1) {
+					if (c1 >= time1) {
+						P1 = false;
+					}
+				}
+				if(!P1) {
+					time1 = F.top().time;
+					name1 = F.top().name;
+					cout << "Процессор Р1 свободен. В него передана задача из очереди " << name1 << " типа Т1. Время выполнения задачи " << time1 << endl;
+					c1 = 0;
+					F.pop();
+					P1 = true;
+				}
+				else {
+					cout << "Процессор Р1 занят. Задача из очереди " << F.top().name << " помещается в стек" << endl;
+					S.push(F.top());
+					F.pop();
+				}
+				break;
+			}
+			case T2: {
+				if (P2) {
+					if (c2 >= time2) {
+						P2 = false;
+					}
+				}
+				if (!P2) {
+					time2 = F.top().time;
+					name2 = F.top().name;
+					cout << "Процессор Р2 свободен. В него передана задача из очереди " << name2 << " типа Т2. Время выполнения задачи " << time2 << endl;
+					c2 = 0;
+					F.pop();
+					P2 = true;
+				}
+				else {
+					cout << "Процессор Р2 занят. Задача из очереди " << F.top().name << " помещается в стек" << endl;
+					S.push(F.top());
+					F.pop();
+				}
+				break;
+			}
+			case T3: {
+				if (P3) {
+					if (c3 >= time3) {
+						P3 = false;
+					}
+				}
+				if (!P3) {
+					time3 = F.top().time;
+					name3 = F.top().name;
+					cout << "Процессор Р3 свободен. В него передана задача из очереди " << name3 << " типа Т3. Время выполнения задачи " << time3 << endl;
+					c3 = 0;
+					F.pop();
+					P3 = true;
+				}
+				else {
+					cout << "Процессор Р3 занят. Задача из очереди " << F.top().name << " помещается в стек" << endl;
+					S.push(F.top());
+					F.pop();
+				}
+				break;
+			}
+			}
+			
+		}
+		else {
+			cout << "Очередь пуста. Задачи поступают из стека." << endl;
+			if (!S.IsEmpty()) {
+				switch (S.Head().type) {
+				case T1: {
+					if (P1) {
+						if (c1 >= time1) {
+							P1 = false;
+						}
+					}
+					if (!P1) {
+						time1 = S.Head().time;
+						name1 = S.Head().name;
+						cout << "Процессор Р1 свободен. В него передана задача из стека " << name1 << " типа Т1. Время выполнения задачи " << time1 << endl;
+						c1 = 0;
+						S.pop();
+						P1 = true;
+					}
+					else {
+						cout << "Процессор Р1 занят. Задача из стека " << S.Head().name << " находится в состоянии ожидания" << endl;
+					}
+					break;
+				}
+				case T2: {
+					if (P2) {
+						if (c2 >= time2) {
+							P2 = false;
+						}
+					}
+					if (!P2) {
+						time2 = S.Head().time;
+						name2 = S.Head().name;
+						cout << "Процессор Р2 свободен. В него передана задача из стека " << name2 << " типа Т1. Время выполнения задачи " << time2 << endl;
+						c2 = 0;
+						S.pop();
+						P2 = true;
+					}
+					else {
+						cout << "Процессор Р2 занят. Задача из стека " << S.Head().name << " находится в состоянии ожидания" << endl;
+					}
+					break;
+				}
+				case T3: {
+					if (P3) {
+						if (c3 >= time3) {
+							P3 = false;
+						}
+					}
+					if (!P3) {
+						time3 = S.Head().time;
+						name3 = S.Head().name;
+						cout << "Процессор Р3 свободен. В него передана задача из стека " << name3 << " типа Т3. Время выполнения задачи " << time3 << endl;
+						c3 = 0;
+						S.pop();
+						P3 = true;
+					}
+					else {
+						cout << "Процессор Р3 занят. Задача из стека " << S.Head().name << " находится в состоянии ожидания" << endl;
+					}
+					break;
+				}
+				}
+			}
+			else {
+				cout << "Стек пуст" << endl;
+				if (!P1 && !P2 && !P3) {
+					cout << "Все задачи обработаны" << endl;
+					_no_stop = false;
+				}
+			}
+		}
+		TIME++;
+		c1++;
+		c2++;
+		c3++;
+		cout << endl;
+	}
+	return 0;
+}
